@@ -44,6 +44,21 @@
         font-size: 24px;
       }
 
+      .ver {
+        display: inline-block;
+        margin-left: 10px;
+        padding: 2px 8px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        font-size: 12px;
+        color: var(--muted);
+        vertical-align: middle;
+      }
+
+      summary {
+        color: var(--link);
+      }
+
       form {
         display: flex;
         gap: 10px;
@@ -121,7 +136,9 @@
   </head>
   <body>
     <div class="wrap">
-      <h1>Client Search</h1>
+      <h1>
+        Client Search <span class="ver" id="ver">clients.html v3</span>
+      </h1>
       <form id="f" autocomplete="off">
         <input id="q" placeholder="Search by first name / last name…" />
         <button type="submit">Search</button>
