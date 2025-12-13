@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Name Search</title>
+    <style>
+      body { font-family: system-ui, Arial; margin: 20px; }
+      .wrap { max-width: 680px; margin: 0 auto; }
+      form { display: flex; gap: 10px; }
+      input { flex: 1; padding: 10px; font-size: 16px; }
+      button { padding: 10px 14px; font-size: 16px; }
+      ul { list-style: none; padding: 0; margin-top: 16px; }
+      li { padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; }
+      .name { font-weight: 700; }
+      .desc { margin-top: 6px; color: #333; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Name Search</h1>
+
+      <form id="searchForm">
+        <input id="q" placeholder="Search First Name..." />
+        <button type="submit">Search</button>
+      </form>
+
+      <ul id="results"></ul>
+    </div>
+
+    <script>
+      const form = document.getElementById("searchForm");
+      const q = document.getElementById("q");
+      const results = document.getElementById("results");
+
+      function render(items) {
+        results.innerHTML = "";
+        if (!items.length) {
+          results.innerHTML = "<li>No results</li>";
+          return;
+        }
+        for (const row of items) {
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <div class="name">${row.First_Name ?? ""}</div>
+            <div class="desc">${row.Description ?? ""}</div>
+          `;
+          results.appendChild(li);
+        }
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const query = q.value.trim();
+        const resp = await fetch(`/api/clients/search?q=${encodeURIComponent(query)}`);
+        if (!resp.ok) {
+          const text = await resp.text();
+          alert("Error:\n" + text);
+          return;
+        }
+        const data = await resp.json();
+        render(data);
+      });
+    </script>
+  </body>
+</html>
