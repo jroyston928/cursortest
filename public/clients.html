@@ -166,27 +166,44 @@
           const nameText = clean(displayName) || "(no name)";
 
           const li = document.createElement("li");
-          const href = id ? `/client.html?id=${encodeURIComponent(id)}` : null;
+          const nameDiv = document.createElement("div");
+          nameDiv.className = "name";
 
-          li.innerHTML = `
-            <div class="name">${
-              href
-                ? `<a href="${href}">${nameText}</a>`
-                : `${nameText}`
-            }</div>
-            <div class="meta">
-              Client_ID: ${id || "(missing)"}${dob ? ` • DOB: ${dob.slice(0, 10)}` : ""}
-            </div>
-          `;
+          if (id) {
+            const a = document.createElement("a");
+            a.href = `/client.html?id=${encodeURIComponent(id)}`;
+            a.textContent = nameText;
+            nameDiv.appendChild(a);
+          } else {
+            nameDiv.textContent = nameText;
+          }
+
+          const metaDiv = document.createElement("div");
+          metaDiv.className = "meta";
+          metaDiv.textContent = `Client_ID: ${id || "(missing)"}${dob ? ` • DOB: ${dob.slice(0, 10)}` : ""}`;
+
+          li.appendChild(nameDiv);
+          li.appendChild(metaDiv);
 
           // If Caspio returned "blank-looking" strings, show safe diagnostics (keys only)
-          if (!id && nameText === "(no name)" && !dob) {
-            const keys = c && typeof c === "object" ? Object.keys(c) : [];
-            const pre = document.createElement("pre");
-            pre.className = "debug";
-            pre.textContent = `Unexpected empty record. Keys: ${keys.join(", ")}`;
-            li.appendChild(pre);
+          const details = document.createElement("details");
+          details.style.marginTop = "10px";
+
+          const summary = document.createElement("summary");
+          summary.textContent = "Debug record";
+          summary.style.cursor = "pointer";
+
+          const pre = document.createElement("pre");
+          pre.className = "debug";
+          try {
+            pre.textContent = JSON.stringify(c, null, 2);
+          } catch {
+            pre.textContent = String(c);
           }
+
+          details.appendChild(summary);
+          details.appendChild(pre);
+          li.appendChild(details);
 
           results.appendChild(li);
         }
