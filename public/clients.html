@@ -106,6 +106,17 @@
         color: var(--muted);
         font-size: 14px;
       }
+
+      .debug {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px dashed var(--border);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--card) 92%, var(--fg) 8%);
+        color: var(--fg);
+        font-size: 12px;
+        overflow-x: auto;
+      }
     </style>
   </head>
   <body>
@@ -124,6 +135,19 @@
       const q = document.getElementById("q");
       const results = document.getElementById("results");
 
+      function clean(v) {
+        if (v === null || v === undefined) return "";
+        return String(v).trim();
+      }
+
+      function pick(obj, keys) {
+        for (const k of keys) {
+          const v = clean(obj?.[k]);
+          if (v) return v;
+        }
+        return "";
+      }
+
       function render(items) {
         results.innerHTML = "";
         if (!Array.isArray(items) || items.length === 0) {
@@ -132,25 +156,38 @@
         }
 
         for (const c of items) {
-          const displayName =
-            c.FullName || [c.FirstName, c.LastName].filter(Boolean).join(" ");
+          const id = pick(c, ["Client_ID", "ClientID", "client_id", "id"]);
+          const fullName = pick(c, ["FullName", "Full_Name", "full_name", "Name", "name"]);
+          const firstName = pick(c, ["FirstName", "First_Name", "first_name", "First", "first"]);
+          const lastName = pick(c, ["LastName", "Last_Name", "last_name", "Last", "last"]);
+          const dob = pick(c, ["DOB", "Dob", "dob", "DateOfBirth", "date_of_birth", "Date_Of_Birth"]);
+
+          const displayName = clean(fullName) || [firstName, lastName].filter(Boolean).join(" ");
+          const nameText = clean(displayName) || "(no name)";
 
           const li = document.createElement("li");
-          const id = c.Client_ID || "";
           const href = id ? `/client.html?id=${encodeURIComponent(id)}` : null;
 
           li.innerHTML = `
             <div class="name">${
               href
-                ? `<a href="${href}">${displayName || "(no name)"}</a>`
-                : `${displayName || "(no name)"}`
+                ? `<a href="${href}">${nameText}</a>`
+                : `${nameText}`
             }</div>
             <div class="meta">
-              Client_ID: ${id || "(missing)"}${
-                c.DOB ? ` • DOB: ${String(c.DOB).slice(0, 10)}` : ""
-              }
+              Client_ID: ${id || "(missing)"}${dob ? ` • DOB: ${dob.slice(0, 10)}` : ""}
             </div>
           `;
+
+          // If Caspio returned "blank-looking" strings, show safe diagnostics (keys only)
+          if (!id && nameText === "(no name)" && !dob) {
+            const keys = c && typeof c === "object" ? Object.keys(c) : [];
+            const pre = document.createElement("pre");
+            pre.className = "debug";
+            pre.textContent = `Unexpected empty record. Keys: ${keys.join(", ")}`;
+            li.appendChild(pre);
+          }
+
           results.appendChild(li);
         }
       }
