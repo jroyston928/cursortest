@@ -1,0 +1,9 @@
+{
+  "name": "caspio-name-search",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^4.19.2"
+  }
+}

@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>NOVA - Client Profile</title>
+    <style>
+      body { font-family: system-ui; margin: 20px; }
+      .card { padding: 14px; border: 1px solid #ddd; border-radius: 12px; max-width: 720px; }
+      .h { font-size: 22px; font-weight: 800; }
+      .row { margin-top: 8px; color: #333; }
+      code { background: #f4f4f4; padding: 2px 6px; border-radius: 6px; }
+    </style>
+  </head>
+  <body>
+    <p><a href="/clients.html">← Back to search</a></p>
+    <div class="card">
+      <div class="h" id="name">Loading…</div>
+      <div class="row" id="meta"></div>
+      <pre id="raw" style="margin-top:12px;"></pre>
+    </div>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const id = params.get("id");
+
+      async function run() {
+        if (!id) {
+          document.getElementById("name").textContent = "Missing id";
+          return;
+        }
+        const resp = await fetch(`/api/clients/${encodeURIComponent(id)}`);
+        const data = await resp.json();
+
+        if (!data) {
+          document.getElementById("name").textContent = "Not found";
+          return;
+        }
+
+        document.getElementById("name").textContent = data.FullName || `${data.FirstName || ""} ${data.LastName || ""}`.trim();
+        document.getElementById("meta").innerHTML = `Client_ID: <code>${data.Client_ID}</code> ${data.DOB ? " • DOB: " + data.DOB : ""} ${data.Age ? " • Age: " + data.Age : ""}`;
+        document.getElementById("raw").textContent = JSON.stringify(data, null, 2);
+      }
+
+      run();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+<script>
+  const f = document.getElementById("f");
+  const q = document.getElementById("q");
+  const results = document.getElementById("results");
+
+  function render(items) {
+    results.innerHTML = "";
+    if (!Array.isArray(items) || items.length === 0) {
+      results.innerHTML = `<li><pre>${JSON.stringify(items, null, 2)}</pre></li>`;
+return;
+
+    }
+
+    for (const c of items) {
+      const li = document.createElement("li");
+
+      const displayName =
+        c.FullName || [c.FirstName, c.LastName].filter(Boolean).join(" ");
+
+      li.innerHTML = `
+        <div class="name">${displayName || "(no name)"}</div>
+        <div class="meta">
+          Client_ID: ${c.Client_ID || ""} ${c.DOB ? " • DOB: " + String(c.DOB).slice(0,10) : ""}
+        </div>
+      `;
+      results.appendChild(li);
+    }
+  }
+
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const query = q.value.trim();
+
+    // show something immediately
+    results.innerHTML = "<li>Searching…</li>";
+
+    try {
+      const url = `/api/clients/search?q=${encodeURIComponent(query)}`;
+      console.log("Fetching:", url);
+
+      const resp = await fetch(url);
+
+      // If the server returned HTML or an error, show it
+      const text = await resp.text();
+      console.log("Raw response:", text.slice(0, 500));
+
+      if (!resp.ok) {
+        results.innerHTML = `<li>HTTP ${resp.status}: <pre>${text}</pre></li>`;
+        return;
+      }
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (err) {
+        results.innerHTML = `<li>Response was not JSON:<pre>${text}</pre></li>`;
+        return;
+      }
+
+      console.log("Parsed JSON count:", Array.isArray(data) ? data.length : "not array", data);
+      render(data);
+    } catch (err) {
+      results.innerHTML = `<li>JS error: ${String(err)}</li>`;
+    }
+  });
+</script>
+
