@@ -86,6 +86,119 @@ function normalizeClientRow(r) {
   };
 }
 
+function normalizePhone(value) {
+  const s = clean(value);
+  return s;
+}
+
+function joinNonEmpty(parts, sep = ", ") {
+  return parts.map(clean).filter(Boolean).join(sep);
+}
+
+function normalizeClientDetailsRow(r) {
+  const base = normalizeClientRow(r);
+
+  const address = joinNonEmpty(
+    [
+      pick(r, ["Address", "Street", "StreetAddress", "Address1", "Address_1", "HomeAddress", "MailingAddress"]),
+      pick(r, ["Address2", "Address_2", "Apt", "Apartment", "Unit"]),
+    ],
+    " "
+  );
+
+  const city = pick(r, ["City", "city", "HomeCity"]);
+  const state = pick(r, ["State", "state", "Province", "Region"]);
+  const zip = pick(r, ["Zip", "ZipCode", "ZIP", "PostalCode", "PostCode"]);
+
+  const pronouns = pick(r, ["Pronouns", "Pronoun", "PreferredPronouns", "Preferred_Pronouns"]);
+  const ethnicity = pick(r, ["Ethnicity", "Race", "RaceEthnicity", "Race_Ethnicity"]);
+  const culturalNotes = pick(r, [
+    "CulturalNotes",
+    "Cultural_Notes",
+    "SpiritualReligiousCultural",
+    "Spiritual_Religious_Cultural",
+    "CulturalBeliefs",
+    "Cultural_Beliefs",
+  ]);
+
+  // Guardian 1
+  const g1Name = pick(r, ["Guardian1Name", "Guardian_1_Name", "Parent1Name", "Parent_1_Name", "PrimaryGuardianName"]);
+  const g1Dob = pick(r, ["Guardian1DOB", "Guardian_1_DOB", "Parent1DOB", "Parent_1_DOB"]);
+  const g1Rel = pick(r, ["Guardian1Relationship", "Guardian_1_Relationship", "Parent1Relationship", "Parent_1_Relationship"]);
+  const g1Address = joinNonEmpty(
+    [
+      pick(r, ["Guardian1Address", "Guardian_1_Address", "Parent1Address", "Parent_1_Address"]),
+      pick(r, ["Guardian1Address2", "Guardian_1_Address2", "Parent1Address2", "Parent_1_Address2"]),
+    ],
+    " "
+  );
+  const g1City = pick(r, ["Guardian1City", "Guardian_1_City", "Parent1City", "Parent_1_City"]);
+  const g1State = pick(r, ["Guardian1State", "Guardian_1_State", "Parent1State", "Parent_1_State"]);
+  const g1Zip = pick(r, ["Guardian1Zip", "Guardian_1_Zip", "Guardian1ZipCode", "Parent1Zip", "Parent_1_Zip"]);
+  const g1HomePhone = normalizePhone(pick(r, ["Guardian1HomePhone", "Guardian_1_HomePhone", "Parent1HomePhone", "Parent_1_HomePhone", "HomePhone1"]));
+  const g1WorkPhone = normalizePhone(pick(r, ["Guardian1WorkPhone", "Guardian_1_WorkPhone", "Parent1WorkPhone", "Parent_1_WorkPhone", "WorkPhone1"]));
+  const g1CellPhone = normalizePhone(pick(r, ["Guardian1CellPhone", "Guardian_1_CellPhone", "Parent1CellPhone", "Parent_1_CellPhone", "CellPhone1", "Mobile1"]));
+  const g1Email = pick(r, ["Guardian1Email", "Guardian_1_Email", "Parent1Email", "Parent_1_Email", "Email1"]);
+
+  // Guardian 2
+  const g2Name = pick(r, ["Guardian2Name", "Guardian_2_Name", "Parent2Name", "Parent_2_Name", "SecondaryGuardianName"]);
+  const g2Dob = pick(r, ["Guardian2DOB", "Guardian_2_DOB", "Parent2DOB", "Parent_2_DOB"]);
+  const g2Rel = pick(r, ["Guardian2Relationship", "Guardian_2_Relationship", "Parent2Relationship", "Parent_2_Relationship"]);
+  const g2Address = joinNonEmpty(
+    [
+      pick(r, ["Guardian2Address", "Guardian_2_Address", "Parent2Address", "Parent_2_Address"]),
+      pick(r, ["Guardian2Address2", "Guardian_2_Address2", "Parent2Address2", "Parent_2_Address2"]),
+    ],
+    " "
+  );
+  const g2City = pick(r, ["Guardian2City", "Guardian_2_City", "Parent2City", "Parent_2_City"]);
+  const g2State = pick(r, ["Guardian2State", "Guardian_2_State", "Parent2State", "Parent_2_State"]);
+  const g2Zip = pick(r, ["Guardian2Zip", "Guardian_2_Zip", "Guardian2ZipCode", "Parent2Zip", "Parent_2_Zip"]);
+  const g2HomePhone = normalizePhone(pick(r, ["Guardian2HomePhone", "Guardian_2_HomePhone", "Parent2HomePhone", "Parent_2_HomePhone", "HomePhone2"]));
+  const g2WorkPhone = normalizePhone(pick(r, ["Guardian2WorkPhone", "Guardian_2_WorkPhone", "Parent2WorkPhone", "Parent_2_WorkPhone", "WorkPhone2"]));
+  const g2CellPhone = normalizePhone(pick(r, ["Guardian2CellPhone", "Guardian_2_CellPhone", "Parent2CellPhone", "Parent_2_CellPhone", "CellPhone2", "Mobile2"]));
+  const g2Email = pick(r, ["Guardian2Email", "Guardian_2_Email", "Parent2Email", "Parent_2_Email", "Email2"]);
+
+  const primaryContact = pick(r, ["PrimaryContact", "Primary_Contact", "PrimaryContactName", "Primary_Contact_Name"]);
+
+  return {
+    ...base,
+    Address: address,
+    City: city,
+    State: state,
+    ZipCode: zip,
+    Pronouns: pronouns,
+    Ethnicity: ethnicity,
+    CulturalNotes: culturalNotes,
+
+    Guardian1Name: g1Name,
+    Guardian1DOB: g1Dob,
+    Guardian1Relationship: g1Rel,
+    Guardian1Address: g1Address,
+    Guardian1City: g1City,
+    Guardian1State: g1State,
+    Guardian1ZipCode: g1Zip,
+    Guardian1HomePhone: g1HomePhone,
+    Guardian1WorkPhone: g1WorkPhone,
+    Guardian1CellPhone: g1CellPhone,
+    Guardian1Email: g1Email,
+
+    Guardian2Name: g2Name,
+    Guardian2DOB: g2Dob,
+    Guardian2Relationship: g2Rel,
+    Guardian2Address: g2Address,
+    Guardian2City: g2City,
+    Guardian2State: g2State,
+    Guardian2ZipCode: g2Zip,
+    Guardian2HomePhone: g2HomePhone,
+    Guardian2WorkPhone: g2WorkPhone,
+    Guardian2CellPhone: g2CellPhone,
+    Guardian2Email: g2Email,
+
+    PrimaryContact: primaryContact,
+  };
+}
+
 function inferTotalFromCaspioResponse(data) {
   if (!data || typeof data !== "object") return null;
   const candidates = [
@@ -177,7 +290,7 @@ router.get("/:id", async (req, res) => {
     const where = `Client_ID = '${sqlEscape(id)}'`;
     const rows = await caspioTableRecords(TABLE, { where, pageSize: 1 });
 
-    res.json(rows[0] ? normalizeClientRow(rows[0]) : null);
+    res.json(rows[0] ? normalizeClientDetailsRow(rows[0]) : null);
   } catch (err) {
     res.status(500).json({ error: String(err.message || err) });
   }

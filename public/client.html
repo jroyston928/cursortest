@@ -1,59 +1,670 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="UTF-8" />
-    <title>NOVA - Client Profile</title>
+    <title>Abarray - Client profile</title>
     <style>
       :root {
-        --bg: #ffffff;
-        --fg: #111827;
-        --muted: #374151;
-        --border: #e5e7eb;
-        --card: #ffffff;
-        --link: #1d4ed8;
+        --nav: #062a4a;
+        --nav2: #07223b;
+        --navActive: rgba(255, 255, 255, 0.08);
+        --bg: #f6f8fb;
+        --panel: #ffffff;
+        --line: #e8edf4;
+        --muted: #7a879b;
+        --text: #13233c;
+        --blue: #637bff;
+        --blue2: #4a63ff;
+        --shadow: 0 8px 22px rgba(10, 25, 45, 0.06);
       }
 
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --bg: #0b1220;
-          --fg: #e5e7eb;
-          --muted: #cbd5e1;
-          --border: #243047;
-          --card: #0f172a;
-          --link: #93c5fd;
-        }
-      }
+      * { box-sizing: border-box; }
 
       body {
+        margin: 0;
         font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-        margin: 20px;
         background: var(--bg);
-        color: var(--fg);
+        color: var(--text);
       }
 
-      a { color: var(--link); text-decoration: none; }
-      a:hover { text-decoration: underline; }
+      a { color: inherit; text-decoration: none; }
 
-      .card {
-        padding: 14px;
-        border: 1px solid var(--border);
+      .app {
+        display: grid;
+        grid-template-columns: 240px 380px 1fr;
+        min-height: 100vh;
+      }
+
+      /* Sidebar (same as list) */
+      .sidebar {
+        background: linear-gradient(180deg, var(--nav), var(--nav2));
+        color: #fff;
+        padding: 18px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px 14px;
+      }
+      .brand .name { font-weight: 800; font-size: 22px; letter-spacing: 0.2px; }
+      .collapseBtn {
+        width: 30px; height: 30px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.08);
+        display: grid; place-items: center;
+      }
+      .navSection { margin-top: 10px; }
+      .navItem {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
         border-radius: 12px;
-        background: var(--card);
-        max-width: 720px;
+        color: rgba(255,255,255,0.92);
       }
-      .h { font-size: 22px; font-weight: 800; }
-      .row { margin-top: 8px; color: var(--muted); }
-      code { background: rgba(127,127,127,0.15); padding: 2px 6px; border-radius: 6px; }
-      pre { margin-top: 12px; white-space: pre-wrap; color: var(--muted); }
+      .navItem:hover { background: rgba(255,255,255,0.06); }
+      .navItem.active { background: var(--navActive); }
+      .navIcon { width: 18px; height: 18px; opacity: 0.95; }
+      .sidebarSpacer { flex: 1; }
+      .footerLinks .navItem { color: rgba(255,255,255,0.86); }
+      .userCard {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.10);
+      }
+      .userAvatar {
+        width: 34px; height: 34px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.2);
+        display: grid; place-items: center;
+        font-weight: 700;
+      }
+      .userMeta { display: grid; gap: 2px; }
+      .userMeta .uName { font-weight: 650; font-size: 14px; }
+      .userMeta .uRole { font-size: 12px; opacity: 0.8; }
+
+      /* Middle panel */
+      .sidePanel {
+        padding: 18px 18px 22px;
+      }
+
+      .breadcrumb {
+        color: #93a0b4;
+        font-size: 13px;
+        margin-bottom: 14px;
+      }
+
+      .profileCard {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        padding: 16px;
+      }
+      .profileTop {
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+        padding: 8px 0 12px;
+      }
+      .bigAvatar {
+        width: 74px; height: 74px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: #eef2ff;
+        border: 3px solid rgba(255, 193, 7, 0.75);
+        overflow: hidden;
+        font-weight: 900;
+        color: #1f2937;
+      }
+      .bigAvatar img { width: 100%; height: 100%; object-fit: cover; }
+      .pName { font-weight: 800; }
+      .pId { color: #ff8a3d; font-size: 12px; }
+
+      .menuCard {
+        margin-top: 14px;
+        background: #f3f7ff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+      }
+      .menuTitle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        color: #2b3b55;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(232, 237, 244, 0.8);
+        margin-bottom: 10px;
+      }
+      .menuTitle .pill {
+        width: 28px; height: 28px;
+        border-radius: 999px;
+        display: grid; place-items: center;
+        background: rgba(99,123,255,0.14);
+        color: var(--blue2);
+      }
+      .menuList { display: grid; gap: 8px; }
+      .menuItem {
+        width: 100%;
+        text-align: left;
+        border: 1px solid transparent;
+        background: transparent;
+        padding: 10px 12px;
+        border-radius: 10px;
+        color: #40506a;
+        font-weight: 650;
+        cursor: pointer;
+      }
+      .menuItem:hover { background: rgba(255,255,255,0.7); }
+      .menuItem.active {
+        background: var(--blue);
+        border-color: transparent;
+        color: #fff;
+      }
+
+      .smallCard {
+        margin-top: 14px;
+        background: #f3f7ff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #2b3b55;
+        font-weight: 700;
+      }
+      .smallCard .left {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .smallIcon {
+        width: 28px; height: 28px;
+        border-radius: 10px;
+        border: 1px solid rgba(99,123,255,0.25);
+        background: rgba(255,255,255,0.7);
+        display: grid; place-items: center;
+        color: var(--blue2);
+      }
+
+      .fab {
+        position: sticky;
+        bottom: 16px;
+        margin-top: 18px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .fabBtn {
+        width: 44px; height: 44px;
+        border-radius: 999px;
+        border: 0;
+        background: var(--blue);
+        color: #fff;
+        font-size: 20px;
+        box-shadow: 0 10px 18px rgba(74, 99, 255, 0.25);
+        cursor: pointer;
+      }
+      .fabBtn:hover { background: var(--blue2); }
+
+      /* Main content */
+      .main {
+        padding: 18px 18px 26px;
+      }
+      .mainHeader {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+      .hLeft { display: flex; align-items: center; gap: 12px; }
+      .hIcon {
+        width: 30px; height: 30px;
+        border-radius: 999px;
+        display: grid; place-items: center;
+        background: rgba(99,123,255,0.14);
+        color: var(--blue2);
+      }
+      .hTitle { font-weight: 800; font-size: 18px; }
+      .hBtn {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: #fff;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        color: #93a0b4;
+      }
+      .hBtn:hover { background: #fbfcfe; }
+
+      .content {
+        margin-top: 14px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        padding: 18px;
+      }
+
+      .sectionTitle {
+        margin: 2px 0 14px;
+        color: var(--blue2);
+        font-weight: 800;
+        font-size: 14px;
+      }
+
+      .kvGrid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px 24px;
+      }
+
+      .kv .k {
+        color: #93a0b4;
+        font-size: 11px;
+        margin-bottom: 6px;
+      }
+      .kv .v {
+        color: var(--text);
+        font-weight: 650;
+        font-size: 13px;
+      }
+      .kv .v.muted { color: var(--muted); font-weight: 600; }
+
+      .divider { height: 1px; background: var(--line); margin: 18px 0; }
+
+      .wide { grid-column: span 2; }
+      .full { grid-column: 1 / -1; }
+
+      pre#raw {
+        margin-top: 18px;
+        padding: 12px;
+        background: #fbfcfe;
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+        color: var(--muted);
+        overflow-x: auto;
+        white-space: pre-wrap;
+      }
+
+      @media (max-width: 1200px) {
+        .app { grid-template-columns: 240px 340px 1fr; }
+        .kvGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 980px) {
+        .app { grid-template-columns: 1fr; }
+        .sidebar { display: none; }
+        .sidePanel { display: none; }
+        .kvGrid { grid-template-columns: 1fr; }
+      }
     </style>
   </head>
   <body>
-    <p><a href="/clients.html">← Back to search</a></p>
-    <div class="card">
-      <div class="h" id="name">Loading…</div>
-      <div class="row" id="meta"></div>
-      <pre id="raw" hidden></pre>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="name">Abarray</div>
+          <div class="collapseBtn" title="Collapse (not implemented)">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M14 7l-5 5 5 5" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="navSection">
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M4 11h7V4H4v7zm0 9h7v-7H4v7zm9 0h7V4h-7v16z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Dashboard
+          </a>
+          <a class="navItem active" href="/clients.html">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4 0-8 2-8 6h16c0-4-4-6-8-6Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Student
+          </a>
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M6 4h12v4H6V4Zm0 6h12v10H6V10Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Programme
+          </a>
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M7 2v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10h18V10Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Calendar
+          </a>
+        </div>
+
+        <div class="sidebarSpacer"></div>
+
+        <div class="footerLinks">
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M12 15.5a3.5 3.5 0 1 0-3.5-3.5 3.5 3.5 0 0 0 3.5 3.5Zm8.94-2.5a7.96 7.96 0 0 0 0-2l2.03-1.58-2-3.46-2.46 1a8 8 0 0 0-1.73-1l-.37-2.6H9.59l-.37 2.6a8 8 0 0 0-1.73 1l-2.46-1-2 3.46L4.06 11a7.96 7.96 0 0 0 0 2L2.03 14.58l2 3.46 2.46-1a8 8 0 0 0 1.73 1l.37 2.6h4.82l.37-2.6a8 8 0 0 0 1.73-1l2.46 1 2-3.46L20.94 13Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Settings
+          </a>
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2a10 10 0 1 0 10 10A10.01 10.01 0 0 0 12 2Zm1 17h-2v-2h2Zm2.07-7.75-.9.92A2.49 2.49 0 0 0 13 14h-2v-.5a3.5 3.5 0 0 1 1.02-2.48l1.24-1.26a1.5 1.5 0 1 0-2.56-1.06H9a3.5 3.5 0 1 1 6.07 2.55Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Support
+          </a>
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M10 17l1.41-1.41L8.83 13H20v-2H8.83l2.58-2.59L10 7l-7 7 7 7Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Logout
+          </a>
+        </div>
+
+        <div class="userCard">
+          <div class="userAvatar">TJ</div>
+          <div class="userMeta">
+            <div class="uName">Tyler Johnson</div>
+            <div class="uRole">Admin</div>
+          </div>
+        </div>
+      </aside>
+
+      <aside class="sidePanel">
+        <div class="breadcrumb">Home &gt; Client &gt; Profile</div>
+
+        <div class="profileCard">
+          <div class="profileTop">
+            <div class="bigAvatar" id="avatar">?</div>
+            <div class="pName" id="pName">Loading…</div>
+            <div class="pId" id="pId">Profile ID: —</div>
+          </div>
+        </div>
+
+        <div class="menuCard">
+          <div class="menuTitle">
+            <div class="pill">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 6.5-7 11-7 11Z" stroke="var(--blue2)" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            Personal Details
+          </div>
+          <div class="menuList" id="menu">
+            <button class="menuItem active" type="button" data-target="general">GENERAL DETAILS</button>
+            <button class="menuItem" type="button" data-target="family">FAMILY DETAILS</button>
+            <button class="menuItem" type="button" data-target="medical">MEDICAL DETAILS</button>
+            <button class="menuItem" type="button" data-target="education">EDUCATION HISTORY</button>
+            <button class="menuItem" type="button" data-target="therapeutic">THERAPEUTIC DETAILS</button>
+            <button class="menuItem" type="button" data-target="behavioural">BEHAVIOURAL DETAILS</button>
+          </div>
+        </div>
+
+        <div class="smallCard">
+          <div class="left">
+            <div class="smallIcon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M7 7h10M7 12h10M7 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            Assessment
+          </div>
+          <div class="muted">+</div>
+        </div>
+
+        <div class="smallCard">
+          <div class="left">
+            <div class="smallIcon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M6 4h12v4H6V4Zm0 6h12v10H6V10Z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+            Programmes
+          </div>
+          <div class="muted">+</div>
+        </div>
+
+        <div class="smallCard">
+          <div class="left">
+            <div class="smallIcon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            Sessions
+          </div>
+          <div class="muted">+</div>
+        </div>
+
+        <div class="fab">
+          <button class="fabBtn" type="button" title="Add (not implemented)">+</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="mainHeader">
+          <div class="hLeft">
+            <div class="hIcon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 6.5-7 11-7 11Z" stroke="var(--blue2)" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="hTitle" id="pageTitle">General Details</div>
+          </div>
+          <button class="hBtn" id="downloadBtn" type="button" title="Download (placeholder)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 9l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 21h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <section class="content" id="general">
+          <div class="sectionTitle">Child details</div>
+          <div class="kvGrid">
+            <div class="kv">
+              <div class="k">Child Name</div>
+              <div class="v" id="c_name">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Date of birth</div>
+              <div class="v" id="c_dob">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Age</div>
+              <div class="v" id="c_age">—</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Address</div>
+              <div class="v" id="c_address">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">City</div>
+              <div class="v" id="c_city">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">State</div>
+              <div class="v" id="c_state">—</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Zip Code</div>
+              <div class="v" id="c_zip">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Gender</div>
+              <div class="v" id="c_gender">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Pronouns</div>
+              <div class="v" id="c_pronouns">—</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Ethnicity</div>
+              <div class="v" id="c_ethnicity">—</div>
+            </div>
+            <div class="kv full">
+              <div class="k">Does the client or family have any spiritual, religious, or cultural beliefs or practices that you think we should be aware of, or that you think may affect treatment?</div>
+              <div class="v muted" id="c_cultural">—</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="sectionTitle">Parent/Guardian 1 Details</div>
+          <div class="kvGrid">
+            <div class="kv">
+              <div class="k">Parent/Guardian Name</div>
+              <div class="v" id="g1_name">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Date of birth</div>
+              <div class="v" id="g1_dob">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Relationship</div>
+              <div class="v" id="g1_rel">—</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Address</div>
+              <div class="v" id="g1_address">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">City</div>
+              <div class="v" id="g1_city">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">State</div>
+              <div class="v" id="g1_state">—</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Zip Code</div>
+              <div class="v" id="g1_zip">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Home Phone</div>
+              <div class="v" id="g1_home">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Work Phone</div>
+              <div class="v" id="g1_work">—</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Cell Phone</div>
+              <div class="v" id="g1_cell">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Email Address</div>
+              <div class="v" id="g1_email">—</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="sectionTitle">Parent/Guardian 2 Details</div>
+          <div class="kvGrid">
+            <div class="kv">
+              <div class="k">Parent/Guardian Name</div>
+              <div class="v" id="g2_name">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Date of birth</div>
+              <div class="v" id="g2_dob">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Relationship</div>
+              <div class="v" id="g2_rel">—</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Address</div>
+              <div class="v" id="g2_address">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">City</div>
+              <div class="v" id="g2_city">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">State</div>
+              <div class="v" id="g2_state">—</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Zip Code</div>
+              <div class="v" id="g2_zip">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Home Phone</div>
+              <div class="v" id="g2_home">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Work Phone</div>
+              <div class="v" id="g2_work">—</div>
+            </div>
+
+            <div class="kv">
+              <div class="k">Cell Phone</div>
+              <div class="v" id="g2_cell">—</div>
+            </div>
+            <div class="kv">
+              <div class="k">Email Address</div>
+              <div class="v" id="g2_email">—</div>
+            </div>
+            <div class="kv full">
+              <div class="k">Who is the primary contact?</div>
+              <div class="v" id="primary_contact">—</div>
+            </div>
+          </div>
+
+          <pre id="raw" hidden></pre>
+        </section>
+
+        <section class="content" id="family" style="display:none">
+          <div class="sectionTitle">Family details</div>
+          <div class="muted">Coming soon.</div>
+        </section>
+        <section class="content" id="medical" style="display:none">
+          <div class="sectionTitle">Medical details</div>
+          <div class="muted">Coming soon.</div>
+        </section>
+        <section class="content" id="education" style="display:none">
+          <div class="sectionTitle">Education history</div>
+          <div class="muted">Coming soon.</div>
+        </section>
+        <section class="content" id="therapeutic" style="display:none">
+          <div class="sectionTitle">Therapeutic details</div>
+          <div class="muted">Coming soon.</div>
+        </section>
+        <section class="content" id="behavioural" style="display:none">
+          <div class="sectionTitle">Behavioural details</div>
+          <div class="muted">Coming soon.</div>
+        </section>
+      </main>
     </div>
 
     <script>
@@ -61,21 +672,138 @@
       const id = params.get("id");
       const debug = params.get("debug") === "1";
 
+      const sections = ["general", "family", "medical", "education", "therapeutic", "behavioural"];
+
+      function clean(v) {
+        if (v === null || v === undefined) return "";
+        return String(v).trim();
+      }
+
+      function setText(id, value) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const s = clean(value);
+        el.textContent = s || "—";
+        el.classList.toggle("muted", !s);
+      }
+
+      function initials(name) {
+        const parts = clean(name).split(/\s+/).filter(Boolean);
+        const a = (parts[0] || "?").slice(0, 1).toUpperCase();
+        const b = (parts[1] || "").slice(0, 1).toUpperCase();
+        return (a + b).trim() || "?";
+      }
+
+      function fmtDob(dob) {
+        const s = clean(dob);
+        if (!s) return "";
+        // Prefer YYYY-MM-DD if that's what we get
+        if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+        return s;
+      }
+
+      function fmtAge(age) {
+        if (age === null || age === undefined || age === "") return "";
+        const n = Number(age);
+        if (!Number.isFinite(n)) return String(age);
+        return `${Math.trunc(n)} years`;
+      }
+
+      function showSection(target) {
+        for (const s of sections) {
+          const el = document.getElementById(s);
+          if (el) el.style.display = s === target ? "" : "none";
+        }
+        const titleMap = {
+          general: "General Details",
+          family: "Family Details",
+          medical: "Medical Details",
+          education: "Education History",
+          therapeutic: "Therapeutic Details",
+          behavioural: "Behavioural Details",
+        };
+        document.getElementById("pageTitle").textContent = titleMap[target] || "Client Profile";
+        for (const btn of document.querySelectorAll(".menuItem")) {
+          btn.classList.toggle("active", btn.dataset.target === target);
+        }
+      }
+
+      document.getElementById("menu").addEventListener("click", (e) => {
+        const btn = e.target.closest(".menuItem");
+        if (!btn) return;
+        showSection(btn.dataset.target);
+      });
+
+      document.getElementById("downloadBtn").addEventListener("click", () => {
+        alert("Download placeholder (hook up to PDF/export next).");
+      });
+
       async function run() {
         if (!id) {
-          document.getElementById("name").textContent = "Missing id";
+          document.getElementById("pName").textContent = "Missing id";
           return;
         }
         const resp = await fetch(`/api/clients/${encodeURIComponent(id)}`);
         const data = await resp.json();
 
         if (!data) {
-          document.getElementById("name").textContent = "Not found";
+          document.getElementById("pName").textContent = "Not found";
           return;
         }
 
-        document.getElementById("name").textContent = data.FullName || `${data.FirstName || ""} ${data.LastName || ""}`.trim();
-        document.getElementById("meta").innerHTML = `Client_ID: <code>${data.Client_ID}</code> ${data.DOB ? " • DOB: " + data.DOB : ""} ${data.Age ? " • Age: " + data.Age : ""}`;
+        const fullName = clean(data.FullName) || `${clean(data.FirstName)} ${clean(data.LastName)}`.trim();
+        document.getElementById("pName").textContent = fullName || "—";
+        document.getElementById("pId").textContent = `Profile ID: ${clean(data.Client_ID) || "—"}`;
+
+        const photoUrl = clean(data.PhotoUrl || data.PhotoURL || data.photoUrl || "");
+        const avatar = document.getElementById("avatar");
+        avatar.innerHTML = "";
+        if (photoUrl) {
+          const img = document.createElement("img");
+          img.alt = "";
+          img.src = photoUrl;
+          avatar.appendChild(img);
+        } else {
+          avatar.textContent = initials(fullName);
+        }
+
+        setText("c_name", fullName);
+        setText("c_dob", fmtDob(data.DOB));
+        setText("c_age", fmtAge(data.Age));
+        setText("c_address", data.Address);
+        setText("c_city", data.City);
+        setText("c_state", data.State);
+        setText("c_zip", data.ZipCode);
+        setText("c_gender", data.Gender);
+        setText("c_pronouns", data.Pronouns);
+        setText("c_ethnicity", data.Ethnicity);
+        setText("c_cultural", data.CulturalNotes || "");
+
+        setText("g1_name", data.Guardian1Name);
+        setText("g1_dob", fmtDob(data.Guardian1DOB));
+        setText("g1_rel", data.Guardian1Relationship);
+        setText("g1_address", data.Guardian1Address);
+        setText("g1_city", data.Guardian1City);
+        setText("g1_state", data.Guardian1State);
+        setText("g1_zip", data.Guardian1ZipCode);
+        setText("g1_home", data.Guardian1HomePhone);
+        setText("g1_work", data.Guardian1WorkPhone);
+        setText("g1_cell", data.Guardian1CellPhone);
+        setText("g1_email", data.Guardian1Email);
+
+        setText("g2_name", data.Guardian2Name);
+        setText("g2_dob", fmtDob(data.Guardian2DOB));
+        setText("g2_rel", data.Guardian2Relationship);
+        setText("g2_address", data.Guardian2Address);
+        setText("g2_city", data.Guardian2City);
+        setText("g2_state", data.Guardian2State);
+        setText("g2_zip", data.Guardian2ZipCode);
+        setText("g2_home", data.Guardian2HomePhone);
+        setText("g2_work", data.Guardian2WorkPhone);
+        setText("g2_cell", data.Guardian2CellPhone);
+        setText("g2_email", data.Guardian2Email);
+        setText("primary_contact", data.PrimaryContact);
+
         if (debug) {
           const pre = document.getElementById("raw");
           pre.hidden = false;
@@ -83,6 +811,7 @@
         }
       }
 
+      showSection("general");
       run();
     </script>
   </body>
