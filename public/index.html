@@ -3,113 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Client Search</title>
+    <title>NOVA - Client Search</title>
+    <meta http-equiv="refresh" content="0; url=/clients.html" />
     <style>
       body { font-family: system-ui, Arial; margin: 20px; }
       .wrap { max-width: 680px; margin: 0 auto; }
-      form { display: flex; gap: 10px; }
-      input { flex: 1; padding: 10px; font-size: 16px; }
-      button { padding: 10px 14px; font-size: 16px; }
-      ul { list-style: none; padding: 0; margin-top: 16px; }
-      li { padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; }
-      .name { font-weight: 700; }
-      .desc { margin-top: 6px; color: #333; }
-      summary { color: #1d4ed8; cursor: pointer; }
-      pre { background: #f7f7f7; padding: 10px; border-radius: 10px; overflow-x: auto; }
+      a { color: #1d4ed8; }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <h1>Client Search <small style="color:#666;font-weight:400">index.html v2</small></h1>
-      <p style="margin-top:-6px;color:#666">
-        Tip: you can also use <a href="/clients.html">/clients.html</a>.
+      <h1>Client Search</h1>
+      <p>
+        Redirecting to <a href="/clients.html">/clients.html</a>…
       </p>
-
-      <form id="searchForm">
-        <input id="q" placeholder="Search by first name / last name…" />
-        <button type="submit">Search</button>
-      </form>
-
-      <ul id="results"></ul>
     </div>
-
-    <script>
-      const form = document.getElementById("searchForm");
-      const q = document.getElementById("q");
-      const results = document.getElementById("results");
-
-      function clean(v) {
-        if (v === null || v === undefined) return "";
-        return String(v).trim();
-      }
-
-      function pick(obj, keys) {
-        for (const k of keys) {
-          const v = clean(obj?.[k]);
-          if (v) return v;
-        }
-        return "";
-      }
-
-      function render(items) {
-        results.innerHTML = "";
-        if (!Array.isArray(items) || !items.length) {
-          results.innerHTML = "<li>No results</li>";
-          return;
-        }
-        for (const row of items) {
-          const id = pick(row, ["Client_ID", "ClientID", "client_id", "id"]);
-          const fullName = pick(row, ["FullName", "Full_Name", "full_name", "Name", "name"]);
-          const firstName = pick(row, ["FirstName", "First_Name", "first_name"]);
-          const lastName = pick(row, ["LastName", "Last_Name", "last_name"]);
-          const dob = pick(row, ["DOB", "Dob", "dob", "DateOfBirth", "date_of_birth", "Date_Of_Birth"]);
-
-          const displayName = clean(fullName) || [firstName, lastName].filter(Boolean).join(" ");
-          const nameText = displayName || "(no name)";
-
-          const li = document.createElement("li");
-          const nameDiv = document.createElement("div");
-          nameDiv.className = "name";
-          if (id) {
-            const a = document.createElement("a");
-            a.href = `/client.html?id=${encodeURIComponent(id)}`;
-            a.textContent = nameText;
-            nameDiv.appendChild(a);
-          } else {
-            nameDiv.textContent = nameText;
-          }
-
-          const descDiv = document.createElement("div");
-          descDiv.className = "desc";
-          descDiv.textContent = `Client_ID: ${id || "(missing)"}${dob ? ` • DOB: ${dob.slice(0, 10)}` : ""}`;
-
-          const details = document.createElement("details");
-          const summary = document.createElement("summary");
-          summary.textContent = "Debug record";
-          const pre = document.createElement("pre");
-          pre.textContent = JSON.stringify(row, null, 2);
-          details.appendChild(summary);
-          details.appendChild(pre);
-
-          li.appendChild(nameDiv);
-          li.appendChild(descDiv);
-          li.appendChild(details);
-          results.appendChild(li);
-        }
-      }
-
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const query = q.value.trim();
-        const resp = await fetch(`/api/clients/search?q=${encodeURIComponent(query)}`);
-        if (!resp.ok) {
-          const text = await resp.text();
-          alert("Error:\n" + text);
-          return;
-        }
-        const data = await resp.json();
-        render(data);
-      });
-    </script>
   </body>
 </html>

@@ -5,11 +5,47 @@
     <meta charset="UTF-8" />
     <title>NOVA - Client Profile</title>
     <style>
-      body { font-family: system-ui; margin: 20px; }
-      .card { padding: 14px; border: 1px solid #ddd; border-radius: 12px; max-width: 720px; }
+      :root {
+        --bg: #ffffff;
+        --fg: #111827;
+        --muted: #374151;
+        --border: #e5e7eb;
+        --card: #ffffff;
+        --link: #1d4ed8;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b1220;
+          --fg: #e5e7eb;
+          --muted: #cbd5e1;
+          --border: #243047;
+          --card: #0f172a;
+          --link: #93c5fd;
+        }
+      }
+
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        margin: 20px;
+        background: var(--bg);
+        color: var(--fg);
+      }
+
+      a { color: var(--link); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+
+      .card {
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--card);
+        max-width: 720px;
+      }
       .h { font-size: 22px; font-weight: 800; }
-      .row { margin-top: 8px; color: #333; }
-      code { background: #f4f4f4; padding: 2px 6px; border-radius: 6px; }
+      .row { margin-top: 8px; color: var(--muted); }
+      code { background: rgba(127,127,127,0.15); padding: 2px 6px; border-radius: 6px; }
+      pre { margin-top: 12px; white-space: pre-wrap; color: var(--muted); }
     </style>
   </head>
   <body>
@@ -17,12 +53,13 @@
     <div class="card">
       <div class="h" id="name">Loading…</div>
       <div class="row" id="meta"></div>
-      <pre id="raw" style="margin-top:12px;"></pre>
+      <pre id="raw" hidden></pre>
     </div>
 
     <script>
       const params = new URLSearchParams(location.search);
       const id = params.get("id");
+      const debug = params.get("debug") === "1";
 
       async function run() {
         if (!id) {
@@ -39,7 +76,11 @@
 
         document.getElementById("name").textContent = data.FullName || `${data.FirstName || ""} ${data.LastName || ""}`.trim();
         document.getElementById("meta").innerHTML = `Client_ID: <code>${data.Client_ID}</code> ${data.DOB ? " • DOB: " + data.DOB : ""} ${data.Age ? " • Age: " + data.Age : ""}`;
-        document.getElementById("raw").textContent = JSON.stringify(data, null, 2);
+        if (debug) {
+          const pre = document.getElementById("raw");
+          pre.hidden = false;
+          pre.textContent = JSON.stringify(data, null, 2);
+        }
       }
 
       run();

@@ -44,21 +44,6 @@
         font-size: 24px;
       }
 
-      .ver {
-        display: inline-block;
-        margin-left: 10px;
-        padding: 2px 8px;
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        font-size: 12px;
-        color: var(--muted);
-        vertical-align: middle;
-      }
-
-      summary {
-        color: var(--link);
-      }
-
       form {
         display: flex;
         gap: 10px;
@@ -121,24 +106,11 @@
         color: var(--muted);
         font-size: 14px;
       }
-
-      .debug {
-        margin-top: 10px;
-        padding: 10px;
-        border: 1px dashed var(--border);
-        border-radius: 10px;
-        background: color-mix(in srgb, var(--card) 92%, var(--fg) 8%);
-        color: var(--fg);
-        font-size: 12px;
-        overflow-x: auto;
-      }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <h1>
-        Client Search <span class="ver" id="ver">clients.html v3</span>
-      </h1>
+      <h1>Client Search</h1>
       <form id="f" autocomplete="off">
         <input id="q" placeholder="Search by first name / last name…" />
         <button type="submit">Search</button>
@@ -151,6 +123,7 @@
       const f = document.getElementById("f");
       const q = document.getElementById("q");
       const results = document.getElementById("results");
+      const debug = new URLSearchParams(location.search).get("debug") === "1";
 
       function clean(v) {
         if (v === null || v === undefined) return "";
@@ -173,13 +146,15 @@
         }
 
         for (const c of items) {
+          // API returns a normalized shape; keep fallbacks in case you reuse the UI elsewhere.
           const id = pick(c, ["Client_ID", "ClientID", "client_id", "id"]);
           const fullName = pick(c, ["FullName", "Full_Name", "full_name", "Name", "name"]);
-          const firstName = pick(c, ["FirstName", "First_Name", "first_name", "First", "first"]);
-          const lastName = pick(c, ["LastName", "Last_Name", "last_name", "Last", "last"]);
+          const firstName = pick(c, ["FirstName", "First_Name", "first_name"]);
+          const lastName = pick(c, ["LastName", "Last_Name", "last_name"]);
           const dob = pick(c, ["DOB", "Dob", "dob", "DateOfBirth", "date_of_birth", "Date_Of_Birth"]);
 
-          const displayName = clean(fullName) || [firstName, lastName].filter(Boolean).join(" ");
+          const displayName =
+            clean(fullName) || [firstName, lastName].filter(Boolean).join(" ");
           const nameText = clean(displayName) || "(no name)";
 
           const li = document.createElement("li");
@@ -202,25 +177,18 @@
           li.appendChild(nameDiv);
           li.appendChild(metaDiv);
 
-          // If Caspio returned "blank-looking" strings, show safe diagnostics (keys only)
-          const details = document.createElement("details");
-          details.style.marginTop = "10px";
-
-          const summary = document.createElement("summary");
-          summary.textContent = "Debug record";
-          summary.style.cursor = "pointer";
-
-          const pre = document.createElement("pre");
-          pre.className = "debug";
-          try {
-            pre.textContent = JSON.stringify(c, null, 2);
-          } catch {
-            pre.textContent = String(c);
+          if (debug) {
+            const pre = document.createElement("pre");
+            pre.style.marginTop = "10px";
+            pre.style.whiteSpace = "pre-wrap";
+            pre.style.color = "var(--muted)";
+            try {
+              pre.textContent = JSON.stringify(c, null, 2);
+            } catch {
+              pre.textContent = String(c);
+            }
+            li.appendChild(pre);
           }
-
-          details.appendChild(summary);
-          details.appendChild(pre);
-          li.appendChild(details);
 
           results.appendChild(li);
         }
