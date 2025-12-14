@@ -75,9 +75,13 @@ function buildCaspioQuery(params) {
   return s ? `?${s}` : "";
 }
 
-export async function caspioTableRecords(table, params = {}) {
+export async function caspioTableQuery(table, params = {}) {
   const qs = buildCaspioQuery(params);
-  const data = await caspioGet(`/rest/v2/tables/${table}/records${qs}`);
+  return caspioGet(`/rest/v2/tables/${table}/records${qs}`);
+}
+
+export async function caspioTableRecords(table, params = {}) {
+  const data = await caspioTableQuery(table, params);
   return data.Result || [];
 }
 

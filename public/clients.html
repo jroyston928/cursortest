@@ -3,230 +3,686 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>NOVA - Client Search</title>
+    <title>Abarray - Client list</title>
     <style>
       :root {
-        --bg: #ffffff;
-        --fg: #111827;
-        --muted: #374151;
-        --border: #e5e7eb;
-        --card: #ffffff;
-        --card-hover: #f9fafb;
-        --link: #1d4ed8;
+        --nav: #062a4a;
+        --nav2: #07223b;
+        --navActive: rgba(255, 255, 255, 0.08);
+        --bg: #f6f8fb;
+        --panel: #ffffff;
+        --line: #e8edf4;
+        --muted: #7a879b;
+        --text: #13233c;
+        --blue: #637bff;
+        --blue2: #4a63ff;
+        --shadow: 0 8px 22px rgba(10, 25, 45, 0.06);
       }
 
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --bg: #0b1220;
-          --fg: #e5e7eb;
-          --muted: #cbd5e1;
-          --border: #243047;
-          --card: #0f172a;
-          --card-hover: #111c33;
-          --link: #93c5fd;
-        }
-      }
+      * { box-sizing: border-box; }
 
       body {
+        margin: 0;
         font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-        margin: 20px;
         background: var(--bg);
-        color: var(--fg);
+        color: var(--text);
       }
 
-      .wrap {
-        max-width: 760px;
-        margin: 0 auto;
+      a { color: inherit; text-decoration: none; }
+
+      .app {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        min-height: 100vh;
       }
 
-      h1 {
-        margin: 0 0 12px;
-        font-size: 24px;
-      }
-
-      form {
+      /* Sidebar */
+      .sidebar {
+        background: linear-gradient(180deg, var(--nav), var(--nav2));
+        color: #fff;
+        padding: 18px 14px;
         display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px 14px;
+      }
+      .brand .name { font-weight: 800; font-size: 22px; letter-spacing: 0.2px; }
+      .collapseBtn {
+        width: 30px; height: 30px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.08);
+        display: grid; place-items: center;
+      }
+
+      .navSection { margin-top: 10px; }
+      .navItem {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        color: rgba(255,255,255,0.92);
+      }
+      .navItem:hover { background: rgba(255,255,255,0.06); }
+      .navItem.active { background: var(--navActive); }
+      .navIcon { width: 18px; height: 18px; opacity: 0.95; }
+
+      .sidebarSpacer { flex: 1; }
+      .footerLinks .navItem { color: rgba(255,255,255,0.86); }
+
+      .userCard {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.10);
+      }
+      .userAvatar {
+        width: 34px; height: 34px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.2);
+        display: grid; place-items: center;
+        font-weight: 700;
+      }
+      .userMeta { display: grid; gap: 2px; }
+      .userMeta .uName { font-weight: 650; font-size: 14px; }
+      .userMeta .uRole { font-size: 12px; opacity: 0.8; }
+
+      /* Main */
+      .main {
+        padding: 22px 22px 26px;
+      }
+
+      .topbar {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .titleIcon {
+        width: 30px; height: 30px;
+        border-radius: 999px;
+        display: grid; place-items: center;
+        background: rgba(99,123,255,0.14);
+        color: var(--blue2);
+      }
+      .titleText { font-weight: 750; font-size: 18px; }
+
+      .contentCard {
+        margin-top: 14px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .toolbar {
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .searchWrap {
+        flex: 1;
+        display: flex;
+        align-items: center;
         gap: 10px;
       }
 
-      input {
+      .searchInput {
         flex: 1;
-        padding: 10px 12px;
-        font-size: 16px;
-        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--line);
         border-radius: 10px;
-        background: var(--card);
-        color: var(--fg);
+        overflow: hidden;
+        background: #fbfcfe;
+      }
+      .searchInput input {
+        flex: 1;
+        border: 0;
+        outline: none;
+        padding: 10px 12px;
+        font-size: 14px;
+        background: transparent;
+        color: var(--text);
+      }
+      .searchBtn {
+        width: 44px;
+        border: 0;
+        border-left: 1px solid var(--line);
+        background: #ffffff;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
       }
 
-      button {
-        padding: 10px 14px;
-        font-size: 16px;
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
         border-radius: 10px;
-        border: 1px solid var(--border);
-        background: var(--card);
-        color: var(--fg);
+        border: 1px solid var(--line);
+        background: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--text);
+      }
+      .btn:hover { background: #fbfcfe; }
+      .btnPrimary {
+        margin-left: auto;
+        background: var(--blue);
+        border-color: transparent;
+        color: #fff;
+        padding: 10px 14px;
+      }
+      .btnPrimary:hover { background: var(--blue2); }
+
+      /* Table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      thead th {
+        text-align: left;
+        font-weight: 650;
+        color: #93a0b4;
+        font-size: 12px;
+        padding: 12px 16px;
+        background: #ffffff;
+      }
+      tbody td {
+        padding: 12px 16px;
+        border-top: 1px solid var(--line);
+        font-size: 14px;
+        color: var(--text);
+        vertical-align: middle;
+      }
+      tbody tr:hover { background: #fafcff; }
+
+      .clientCell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 260px;
+      }
+      .avatar {
+        width: 34px; height: 34px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        color: #1f2937;
+        background: #eef2ff;
+        border: 1px solid rgba(99,123,255,0.35);
+        font-weight: 800;
+        overflow: hidden;
+        flex: 0 0 auto;
+      }
+      .avatar img { width: 100%; height: 100%; object-fit: cover; }
+      .clientName { font-weight: 650; }
+      .muted { color: var(--muted); }
+
+      .progressWrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .bar {
+        width: 140px;
+        height: 6px;
+        border-radius: 999px;
+        background: #e9eef7;
+        overflow: hidden;
+      }
+      .bar > div {
+        height: 100%;
+        width: 0%;
+        background: var(--blue);
+        border-radius: 999px;
+      }
+      .pct {
+        font-size: 12px;
+        color: var(--muted);
+        min-width: 34px;
+        text-align: right;
+      }
+
+      .tableFooter {
+        padding: 12px 14px;
+        border-top: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+      .pager {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .pageBtn {
+        width: 22px; height: 22px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+        background: #fff;
+        display: grid;
+        place-items: center;
         cursor: pointer;
       }
-
-      ul {
-        list-style: none;
-        padding: 0;
-        margin: 16px 0 0;
-      }
-
-      li {
-        margin-bottom: 10px;
-        padding: 12px;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: var(--card);
-      }
-
-      li:hover {
-        background: var(--card-hover);
-      }
-
-      a {
-        color: var(--link);
-        text-decoration: none;
-      }
-
-      a:hover {
-        text-decoration: underline;
-      }
-
-      .name {
-        font-weight: 800;
-        color: var(--fg);
-      }
-
-      .meta {
-        margin-top: 4px;
+      .pageBtn[disabled] { opacity: 0.5; cursor: not-allowed; }
+      .pageNum {
+        width: 22px; height: 22px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+        background: #fff;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
         color: var(--muted);
-        font-size: 14px;
+      }
+      .pageNum.active {
+        background: #eef2ff;
+        border-color: rgba(99,123,255,0.35);
+        color: var(--text);
+        font-weight: 650;
+      }
+
+      .emptyState {
+        padding: 22px 16px;
+        color: var(--muted);
+      }
+
+      @media (max-width: 980px) {
+        .app { grid-template-columns: 1fr; }
+        .sidebar { display: none; }
+        .main { padding: 14px; }
+        .btnPrimary { margin-left: 0; }
+        .toolbar { flex-wrap: wrap; }
+        .searchWrap { width: 100%; }
       }
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <h1>Client Search</h1>
-      <form id="f" autocomplete="off">
-        <input id="q" placeholder="Search by first name / last name…" />
-        <button type="submit">Search</button>
-      </form>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="name">Abarray</div>
+          <div class="collapseBtn" title="Collapse (not implemented)">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M14 7l-5 5 5 5" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
 
-      <ul id="results" aria-live="polite"></ul>
+        <div class="navSection">
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M4 11h7V4H4v7zm0 9h7v-7H4v7zm9 0h7V4h-7v16z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Dashboard
+          </a>
+          <a class="navItem active" href="/clients.html">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4 0-8 2-8 6h16c0-4-4-6-8-6Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Student
+          </a>
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M6 4h12v4H6V4Zm0 6h12v10H6V10Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Programme
+          </a>
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M7 2v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10h18V10Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Calendar
+          </a>
+        </div>
+
+        <div class="sidebarSpacer"></div>
+
+        <div class="footerLinks">
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M12 15.5a3.5 3.5 0 1 0-3.5-3.5 3.5 3.5 0 0 0 3.5 3.5Zm8.94-2.5a7.96 7.96 0 0 0 0-2l2.03-1.58-2-3.46-2.46 1a8 8 0 0 0-1.73-1l-.37-2.6H9.59l-.37 2.6a8 8 0 0 0-1.73 1l-2.46-1-2 3.46L4.06 11a7.96 7.96 0 0 0 0 2L2.03 14.58l2 3.46 2.46-1a8 8 0 0 0 1.73 1l.37 2.6h4.82l.37-2.6a8 8 0 0 0 1.73-1l2.46 1 2-3.46L20.94 13Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Settings
+          </a>
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2a10 10 0 1 0 10 10A10.01 10.01 0 0 0 12 2Zm1 17h-2v-2h2Zm2.07-7.75-.9.92A2.49 2.49 0 0 0 13 14h-2v-.5a3.5 3.5 0 0 1 1.02-2.48l1.24-1.26a1.5 1.5 0 1 0-2.56-1.06H9a3.5 3.5 0 1 1 6.07 2.55Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Support
+          </a>
+          <a class="navItem" href="#">
+            <svg class="navIcon" viewBox="0 0 24 24" fill="none">
+              <path d="M10 17l1.41-1.41L8.83 13H20v-2H8.83l2.58-2.59L10 7l-7 7 7 7Z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            Logout
+          </a>
+        </div>
+
+        <div class="userCard">
+          <div class="userAvatar">TJ</div>
+          <div class="userMeta">
+            <div class="uName">Tyler Johnson</div>
+            <div class="uRole">Admin</div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <div class="titleIcon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 6.5-7 11-7 11Z" stroke="var(--blue2)" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="titleText">Client list</div>
+        </div>
+
+        <section class="contentCard" aria-label="Client list">
+          <div class="toolbar">
+            <div class="searchWrap">
+              <div class="searchInput" role="search">
+                <input id="q" placeholder="Search" autocomplete="off" />
+                <button class="searchBtn" id="searchBtn" aria-label="Search">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M10.5 18a7.5 7.5 0 1 1 7.5-7.5A7.51 7.51 0 0 1 10.5 18Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+              <button class="btn" id="filterBtn" type="button" aria-haspopup="dialog" aria-expanded="false">
+                Filter
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+
+            <button class="btn btnPrimary" id="importBtn" type="button">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M8 9l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M4 21h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Import
+            </button>
+          </div>
+
+          <div style="overflow:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th style="min-width:260px">Client name</th>
+                  <th style="min-width:140px">Gender</th>
+                  <th style="min-width:140px">Age</th>
+                  <th>Center location</th>
+                  <th style="min-width:240px">Supervising bcba</th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr><td colspan="5" class="emptyState">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tableFooter">
+            <div class="pager" id="pager"></div>
+          </div>
+        </section>
+      </main>
     </div>
 
     <script>
-      const f = document.getElementById("f");
-      const q = document.getElementById("q");
-      const results = document.getElementById("results");
-      const debug = new URLSearchParams(location.search).get("debug") === "1";
+      const tbody = document.getElementById("tbody");
+      const pager = document.getElementById("pager");
+      const qInput = document.getElementById("q");
+      const searchBtn = document.getElementById("searchBtn");
+      const importBtn = document.getElementById("importBtn");
+      const filterBtn = document.getElementById("filterBtn");
+
+      const state = {
+        q: "",
+        page: 1,
+        limit: 10,
+      };
 
       function clean(v) {
         if (v === null || v === undefined) return "";
         return String(v).trim();
       }
 
-      function pick(obj, keys) {
-        for (const k of keys) {
-          const v = clean(obj?.[k]);
-          if (v) return v;
-        }
-        return "";
+      function initials(name) {
+        const parts = clean(name).split(/\s+/).filter(Boolean);
+        const a = (parts[0] || "?").slice(0, 1).toUpperCase();
+        const b = (parts[1] || "").slice(0, 1).toUpperCase();
+        return (a + b).trim() || "?";
       }
 
-      function render(items) {
-        results.innerHTML = "";
+      function formatAge(age) {
+        const n = Number(age);
+        if (!Number.isFinite(n)) return "—";
+        return `${Math.trunc(n)} years`;
+      }
+
+      function formatGender(g) {
+        const s = clean(g);
+        return s || "—";
+      }
+
+      function formatText(s) {
+        return clean(s) || "—";
+      }
+
+      function setUrl() {
+        const u = new URL(location.href);
+        u.searchParams.set("page", String(state.page));
+        if (state.q) u.searchParams.set("q", state.q);
+        else u.searchParams.delete("q");
+        history.replaceState(null, "", u);
+      }
+
+      function parseUrl() {
+        const u = new URL(location.href);
+        state.q = clean(u.searchParams.get("q") || "");
+        state.page = Math.max(1, Number(u.searchParams.get("page") || 1) || 1);
+        qInput.value = state.q;
+      }
+
+      function renderRows(items) {
+        tbody.innerHTML = "";
         if (!Array.isArray(items) || items.length === 0) {
-          results.innerHTML = "<li>No results</li>";
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          td.colSpan = 5;
+          td.className = "emptyState";
+          td.textContent = "No clients found";
+          tr.appendChild(td);
+          tbody.appendChild(tr);
           return;
         }
 
         for (const c of items) {
-          // API returns a normalized shape; keep fallbacks in case you reuse the UI elsewhere.
-          const id = pick(c, ["Client_ID", "ClientID", "client_id", "id"]);
-          const fullName = pick(c, ["FullName", "Full_Name", "full_name", "Name", "name"]);
-          const firstName = pick(c, ["FirstName", "First_Name", "first_name"]);
-          const lastName = pick(c, ["LastName", "Last_Name", "last_name"]);
-          const dob = pick(c, ["DOB", "Dob", "dob", "DateOfBirth", "date_of_birth", "Date_Of_Birth"]);
+          const tr = document.createElement("tr");
 
-          const displayName =
-            clean(fullName) || [firstName, lastName].filter(Boolean).join(" ");
-          const nameText = clean(displayName) || "(no name)";
+          const nameTd = document.createElement("td");
+          const wrap = document.createElement("div");
+          wrap.className = "clientCell";
 
-          const li = document.createElement("li");
-          const nameDiv = document.createElement("div");
-          nameDiv.className = "name";
-
-          if (id) {
-            const a = document.createElement("a");
-            a.href = `/client.html?id=${encodeURIComponent(id)}`;
-            a.textContent = nameText;
-            nameDiv.appendChild(a);
+          const av = document.createElement("div");
+          av.className = "avatar";
+          const photoUrl = clean(c.PhotoUrl || c.PhotoURL || c.photoUrl || "");
+          if (photoUrl) {
+            const img = document.createElement("img");
+            img.alt = "";
+            img.src = photoUrl;
+            av.appendChild(img);
           } else {
-            nameDiv.textContent = nameText;
+            av.textContent = initials(c.FullName || `${c.FirstName || ""} ${c.LastName || ""}`.trim());
           }
 
-          const metaDiv = document.createElement("div");
-          metaDiv.className = "meta";
-          metaDiv.textContent = `Client_ID: ${id || "(missing)"}${dob ? ` • DOB: ${dob.slice(0, 10)}` : ""}`;
+          const nameBlock = document.createElement("div");
+          const link = document.createElement("a");
+          link.className = "clientName";
+          link.href = c.Client_ID ? `/client.html?id=${encodeURIComponent(c.Client_ID)}` : "#";
+          link.textContent = clean(c.FullName) || [clean(c.FirstName), clean(c.LastName)].filter(Boolean).join(" ") || "—";
+          nameBlock.appendChild(link);
 
-          li.appendChild(nameDiv);
-          li.appendChild(metaDiv);
+          wrap.appendChild(av);
+          wrap.appendChild(nameBlock);
+          nameTd.appendChild(wrap);
 
-          if (debug) {
-            const pre = document.createElement("pre");
-            pre.style.marginTop = "10px";
-            pre.style.whiteSpace = "pre-wrap";
-            pre.style.color = "var(--muted)";
-            try {
-              pre.textContent = JSON.stringify(c, null, 2);
-            } catch {
-              pre.textContent = String(c);
-            }
-            li.appendChild(pre);
-          }
+          const genderTd = document.createElement("td");
+          genderTd.textContent = formatGender(c.Gender);
 
-          results.appendChild(li);
+          const ageTd = document.createElement("td");
+          ageTd.textContent = formatAge(c.Age);
+
+          const centerTd = document.createElement("td");
+          centerTd.textContent = formatText(c.CenterLocation);
+
+          const bcbaTd = document.createElement("td");
+          const pWrap = document.createElement("div");
+          pWrap.className = "progressWrap";
+
+          const bar = document.createElement("div");
+          bar.className = "bar";
+          const fill = document.createElement("div");
+          const pct = typeof c.SupervisingBcbaPercent === "number" ? c.SupervisingBcbaPercent : null;
+          fill.style.width = pct === null ? "0%" : `${pct}%`;
+          bar.appendChild(fill);
+
+          const pctText = document.createElement("div");
+          pctText.className = "pct";
+          pctText.textContent = pct === null ? "—" : `${pct}%`;
+
+          pWrap.appendChild(bar);
+          pWrap.appendChild(pctText);
+          bcbaTd.appendChild(pWrap);
+
+          tr.appendChild(nameTd);
+          tr.appendChild(genderTd);
+          tr.appendChild(ageTd);
+          tr.appendChild(centerTd);
+          tr.appendChild(bcbaTd);
+          tbody.appendChild(tr);
         }
       }
 
-      f.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const query = q.value.trim();
-        if (!query) {
-          results.innerHTML = "<li>Enter a search term</li>";
-          return;
+      function renderPager({ page, totalPages }) {
+        pager.innerHTML = "";
+
+        const makeBtn = (label, onClick, disabled = false) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "pageBtn";
+          b.textContent = label;
+          b.disabled = disabled;
+          b.addEventListener("click", onClick);
+          return b;
+        };
+
+        const prev = makeBtn("‹", () => goToPage(state.page - 1), state.page <= 1);
+        pager.appendChild(prev);
+
+        // Show a small window of page numbers, like the wireframe.
+        const tp = Number.isFinite(totalPages) ? totalPages : null;
+        const start = Math.max(1, state.page - 1);
+        const end = tp ? Math.min(tp, start + 4) : state.page + 2;
+
+        for (let p = start; p <= end; p++) {
+          const n = document.createElement("button");
+          n.type = "button";
+          n.className = "pageNum" + (p === state.page ? " active" : "");
+          n.textContent = String(p);
+          n.addEventListener("click", () => goToPage(p));
+          pager.appendChild(n);
         }
 
-        results.innerHTML = "<li>Searching…</li>";
+        const nextDisabled = tp ? state.page >= tp : false;
+        const next = makeBtn("›", () => goToPage(state.page + 1), nextDisabled);
+        pager.appendChild(next);
+      }
 
+      async function load() {
+        setUrl();
+        tbody.innerHTML = `<tr><td colspan="5" class="emptyState">Loading…</td></tr>`;
         try {
-          const url = `/api/clients/search?q=${encodeURIComponent(query)}`;
+          const url = `/api/clients?q=${encodeURIComponent(state.q)}&page=${state.page}&limit=${state.limit}`;
           const resp = await fetch(url);
-          const text = await resp.text();
-
           if (!resp.ok) {
-            results.innerHTML = `<li>HTTP ${resp.status}: <pre>${text}</pre></li>`;
+            const text = await resp.text();
+            tbody.innerHTML = `<tr><td colspan="5" class="emptyState">HTTP ${resp.status}: ${text}</td></tr>`;
+            pager.innerHTML = "";
             return;
           }
+          const data = await resp.json();
+          renderRows(data.items);
+          renderPager({ page: data.page, totalPages: data.totalPages });
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="5" class="emptyState">Error: ${String(e)}</td></tr>`;
+          pager.innerHTML = "";
+        }
+      }
 
-          let data;
-          try {
-            data = JSON.parse(text);
-          } catch {
-            results.innerHTML = `<li>Response was not JSON:<pre>${text}</pre></li>`;
-            return;
-          }
+      function goToPage(p) {
+        state.page = Math.max(1, Number(p) || 1);
+        load();
+      }
 
-          render(data);
-        } catch (err) {
-          results.innerHTML = `<li>JS error: ${String(err)}</li>`;
+      let t = null;
+      function scheduleSearch() {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          state.q = clean(qInput.value);
+          state.page = 1;
+          load();
+        }, 250);
+      }
+
+      qInput.addEventListener("input", scheduleSearch);
+      searchBtn.addEventListener("click", () => scheduleSearch());
+      qInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          scheduleSearch();
         }
       });
+
+      importBtn.addEventListener("click", () => {
+        alert("Import UI only (hook up to your import flow next).");
+      });
+
+      filterBtn.addEventListener("click", () => {
+        alert("Filter UI placeholder (add real filter fields next).");
+      });
+
+      parseUrl();
+      load();
     </script>
   </body>
 </html>
